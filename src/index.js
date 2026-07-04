@@ -1,3 +1,4 @@
+const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const config = require('./config');
@@ -76,9 +77,10 @@ app.use((req, res) => {
 
 app.use(errorHandler);
 
-startWebSocketServer(simulator, alertEngine, powerCalculator);
+const server = http.createServer(app);
+startWebSocketServer(simulator, alertEngine, powerCalculator, { server });
 
-const server = app.listen(config.port, () => {
+server.listen(config.port, () => {
   logger.info(`Backend running on http://${config.host}:${config.port}`);
 });
 

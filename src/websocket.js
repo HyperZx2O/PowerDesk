@@ -3,11 +3,11 @@ const config = require('./config');
 const logger = require('./utils/logger');
 
 function startWebSocketServer(simulator, alertEngine, powerCalculator, options = {}) {
-  const port = options.port || config.wsPort;
+  const wss = options.server
+    ? new WebSocket.Server({ server: options.server })
+    : new WebSocket.Server({ port: options.port || config.wsPort });
 
-  const wss = new WebSocket.Server({ port });
-
-  logger.info(`WebSocket server listening on ws://${config.host}:${port}`);
+  logger.info(`WebSocket server listening on ${options.server ? 'shared HTTP server' : `ws://${config.host}:${options.port || config.wsPort}`}`);
 
   function broadcast(payload) {
     const data = JSON.stringify(payload);
