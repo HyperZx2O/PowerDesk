@@ -27,11 +27,9 @@ Real-time office device monitoring dashboard with a Discord bot for instant quer
 
 ## Architecture
 
-![System Architecture](docs/system-diagram.svg)
+![System Architecture](docs/architecture-diagram.svg)
 
 ![Office Floor Plan](docs/office-floorplan.svg)
-
-![Detailed Architecture](docs/architecture-diagram.svg)
 
 ---
 
