@@ -4,12 +4,16 @@ export const DeviceSchema = z.object({
   id: z.string(),
   name: z.string(),
   type: z.enum(['fan', 'light']),
-  status: z.enum(['on', 'off']),
+  status: z.union([z.boolean(), z.enum(['on', 'off'])]),
   powerDraw: z.number(),
   room: z.string(),
   lastChanged: z.string(),
 });
 
 export type Device = z.infer<typeof DeviceSchema>;
+
+export function isDeviceOn(status: Device['status']): boolean {
+  return status === true || status === 'on';
+}
 
 export const DevicesArraySchema = z.array(DeviceSchema);

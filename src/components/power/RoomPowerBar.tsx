@@ -16,22 +16,21 @@ function getBarColor(watts: number): string {
 
 export function RoomPowerBar({ room, watts, totalWatts }: RoomPowerBarProps) {
   const percentage = totalWatts > 0 ? (watts / totalWatts) * 100 : 0;
-  const barColor = getBarColor(watts);
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-text-muted w-28 truncate">
+      <span className="text-xs text-text-muted w-24 truncate">
         {formatRoomName(room)}
       </span>
-      <div className="flex-1 h-6 bg-background rounded-full overflow-hidden relative">
+      <div className="flex-1 h-1 bg-border overflow-hidden relative rounded-full">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className={clsx('h-full rounded-full', barColor)}
+          className={clsx('h-full rounded-full', getBarColor(watts))}
         />
       </div>
-      <span className="font-mono text-sm text-text-primary w-14 text-right">
+      <span className="font-mono text-xs text-text-muted w-12 text-right tabular-nums">
         {formatWatts(watts)}
       </span>
     </div>

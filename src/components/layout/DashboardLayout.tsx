@@ -20,29 +20,29 @@ export function DashboardLayout({
   floorPlan,
 }: DashboardLayoutProps) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-bg">
       {topBar}
 
-      <div className="p-4 md:p-6">
-        <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6">
-          {/* Left Column - Room Grid */}
-          <div>{roomGrid}</div>
-
-          {/* Right Column - Power & Alerts */}
-          <div className="space-y-6">
-            {powerMeter}
-            <div className="space-y-3">{roomPowerBars}</div>
-            {powerChart}
-            {alertPanel}
+      <div className="mx-auto max-w-7xl px-4 md:px-6 pt-16 pb-12">
+        {/* Hero: Power Meter + bars */}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_1.5fr] gap-6 mb-6">
+          {powerMeter}
+          <div className="space-y-3 self-end pb-2">
+            {roomPowerBars}
           </div>
         </div>
 
-        {/* Floor Plan Placeholder */}
-        {floorPlan && (
-          <div className="mt-6">
-            {floorPlan}
+        {/* Content: Rooms + Alerts */}
+        <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-6 mb-6">
+          <div className="space-y-4">{roomGrid}</div>
+          <div className="space-y-4">
+            {alertPanel}
+            {powerChart}
           </div>
-        )}
+        </div>
+
+        {/* Floor Plan */}
+        {floorPlan && <div className="mt-6">{floorPlan}</div>}
       </div>
     </div>
   );

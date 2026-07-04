@@ -33,8 +33,8 @@ Edit `.env` and fill in the required values:
 | `BACKEND_BASE_URL` | Yes | Backend REST API base URL (e.g. `http://localhost:3000`) |
 | `BACKEND_WS_URL` | Yes | Backend WebSocket URL (e.g. `ws://localhost:3000`) |
 | `COMMAND_PREFIX` | No | Prefix for message commands (default: `!`) |
-| `OPENAI_API_KEY` | No | OpenAI API key for humanized responses (leave blank to disable) |
-| `OPENAI_MODEL` | No | Model for humanization (default: `gpt-4o-mini`) |
+| `GROQ_API_KEY` | No | Groq API key for humanized responses (leave blank to disable) |
+| `GROQ_MODEL` | No | Model for humanization (default: `llama-3.3-70b-versatile`) |
 
 ### 3. Register slash commands
 
@@ -124,4 +124,4 @@ The bot gracefully handles all failure modes:
 
 ## LLM Humanization
 
-When `OPENAI_API_KEY` is set, responses are passed through an LLM for a warmer, more conversational tone. When unset or on failure, the bot falls back to template formatters — it is 100% functional without the LLM layer.
+When `GROQ_API_KEY` is set, responses are passed through an LLM for a warmer, more conversational tone. When unset or on failure, the bot falls back to template formatters — it is 100% functional without the LLM layer.

@@ -10,10 +10,13 @@ import { registerCommand } from "./index.js";
 const ALIAS_MAP: Record<string, string> = {
   drawing: "drawing-room",
   "drawing room": "drawing-room",
+  dr: "drawing-room",
   work1: "work-room-1",
   "work room 1": "work-room-1",
+  wr1: "work-room-1",
   work2: "work-room-2",
   "work room 2": "work-room-2",
+  wr2: "work-room-2",
 };
 
 function resolveRoom(input: string): string | null {

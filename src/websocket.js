@@ -53,11 +53,7 @@ function startWebSocketServer(simulator, alertEngine, powerCalculator, options =
   });
 
   const powerInterval = setInterval(() => {
-    const byRoomData = powerCalculator.getPowerByRoom();
-    const byRoom = {};
-    for (const [room, data] of Object.entries(byRoomData)) {
-      byRoom[room] = data.power;
-    }
+    const byRoom = powerCalculator.getPowerByRoom();
     broadcast({
       type: 'power-update',
       timestamp: new Date().toISOString(),

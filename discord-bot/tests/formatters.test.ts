@@ -92,8 +92,8 @@ describe("statusFormatter", () => {
     const result = formatStatus(mockDevices);
     expect(result).toContain("🏢 Office Status");
     expect(result).toContain("Drawing Room");
-    expect(result).toContain("Fan 1 ON");
-    expect(result).toContain("Fan 2 OFF");
+    expect(result).toContain("🟢 Fan 1");
+    expect(result).toContain("🔴 Fan 2");
   });
 
   it("formats all-off room with shorthand", () => {
@@ -118,7 +118,7 @@ describe("statusFormatter", () => {
       },
     ];
     const result = formatStatus(allOffDevices);
-    expect(result).toContain("all devices OFF");
+    expect(result).toContain("🔴 All OFF");
   });
 
   it("formats all-on room with shorthand", () => {
@@ -143,7 +143,7 @@ describe("statusFormatter", () => {
       },
     ];
     const result = formatStatus(allOnDevices);
-    expect(result).toContain("all devices ON");
+    expect(result).toContain("🟢 All ON");
   });
 
   it("handles empty device list", () => {
@@ -157,16 +157,16 @@ describe("roomFormatter", () => {
     const roomDevices = mockDevices.filter((d) => d.room === "work-room-2");
     const result = formatRoom("work-room-2", roomDevices);
     expect(result).toContain("📍 Work Room 2");
-    expect(result).toContain("Fans:");
-    expect(result).toContain("Lights:");
+    expect(result).toContain("💨 Fans");
+    expect(result).toContain("💡 Lights");
     expect(result).toContain("60W");
     expect(result).toContain("15W");
-    expect(result).toContain("Room total:");
+    expect(result).toContain("**Total:**");
   });
 
   it("formats room with zero power", () => {
     const result = formatRoom("work-room-1", []);
-    expect(result).toContain("Room total: 0W");
+    expect(result).toContain("**Total:**");
   });
 });
 
@@ -176,9 +176,9 @@ describe("usageFormatter", () => {
     expect(result).toContain("⚡ Power Usage");
     expect(result).toContain("150W");
     expect(result).toContain("4.2 kWh");
-    expect(result).toContain("Drawing Room 75W");
-    expect(result).toContain("Work Room 1 0W");
-    expect(result).toContain("Work Room 2 75W");
+    expect(result).toContain("**Drawing Room** 75W");
+    expect(result).toContain("**Work Room 1** 0W");
+    expect(result).toContain("**Work Room 2** 75W");
   });
 
   it("handles zero watts", () => {
@@ -195,7 +195,7 @@ describe("usageFormatter", () => {
 describe("alertFormatter", () => {
   it("formats alert with time", () => {
     const result = formatAlert(mockAlert);
-    expect(result).toContain("⚠️ Alert");
+    expect(result).toContain("⚠️ **Alert**");
     expect(result).toContain("Devices left on after office hours");
     expect(result).toContain("Work Room 2");
   });

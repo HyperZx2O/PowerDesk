@@ -1,5 +1,9 @@
 import type { Device } from "../types.js";
 
+function isOn(status: Device["status"]): boolean {
+  return status === true || status === "on";
+}
+
 export function formatStatus(devices: Device[]): string {
   const rooms = new Map<string, Device[]>();
   for (const device of devices) {
@@ -8,23 +12,30 @@ export function formatStatus(devices: Device[]): string {
     rooms.set(device.room, list);
   }
 
-  const lines: string[] = ["🏢 Office Status"];
+  const lines: string[] = ["## 🏢 Office Status"];
 
   for (const [room, roomDevices] of rooms) {
-    const allOn = roomDevices.every((d) => d.status === "on");
-    const allOff = roomDevices.every((d) => d.status === "off");
-
+    const allOn = roomDevices.every((d) => isOn(d.status));
+    const allOff = roomDevices.every((d) => !isOn(d.status));
     const roomName = formatRoomName(room);
 
+    const totalPower = roomDevices
+      .filter((d) => isOn(d.status))
+      .reduce((sum, d) => sum + d.powerDraw, 0);
+
     if (allOff) {
-      lines.push(`${roomName}: all devices OFF`);
+      lines.push(`**${roomName}** — 🔴 All OFF`);
     } else if (allOn) {
-      lines.push(`${roomName}: all devices ON`);
+      lines.push(`**${roomName}** — 🟢 All ON (${totalPower}W)`);
     } else {
       const deviceList = roomDevices
-        .map((d) => `${d.name} ${d.status.toUpperCase()}`)
-        .join(", ");
-      lines.push(`${roomName}: ${deviceList}`);
+        .map((d) => {
+          const icon = isOn(d.status) ? "🟢" : "🔴";
+          return `${icon} ${d.name}`;
+        })
+        .join(" ");
+      lines.push(`**${roomName}** — ${totalPower}W`);
+      lines.push(`> ${deviceList}`);
     }
   }
 

@@ -6,6 +6,6 @@ const EnvSchema = z.object({
 });
 
 export const env = EnvSchema.parse({
-  VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000',
-  VITE_WS_URL: import.meta.env.VITE_WS_URL ?? 'ws://localhost:3000',
+  VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:5000',
+  VITE_WS_URL: import.meta.env.VITE_WS_URL ?? 'ws://localhost:8080',
 });

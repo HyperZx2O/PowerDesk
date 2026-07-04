@@ -8,3 +8,15 @@ export const apiClient = axios.create({
   },
   timeout: 10000,
 });
+
+apiClient.interceptors.response.use((response) => {
+  const body = response.data;
+  if (body && typeof body === 'object' && 'success' in body) {
+    if (body.success === false) {
+      const msg = body.error?.message ?? 'Backend error';
+      return Promise.reject(new Error(msg));
+    }
+    response.data = body.data;
+  }
+  return response;
+});

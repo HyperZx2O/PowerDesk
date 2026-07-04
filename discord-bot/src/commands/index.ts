@@ -35,7 +35,7 @@ export function createSlashContext(
   return {
     args: [],
     reply: async (content: string) => {
-      await interaction.reply({ content, ephemeral: true });
+      await interaction.reply({ content });
     },
   };
 }

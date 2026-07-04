@@ -27,6 +27,35 @@ app.locals.alertEngine = alertEngine;
 simulator.on('deviceChanged', () => alertEngine.check());
 simulator.start();
 
+// Demo alert generator: fires every 30s using real simulator device data
+// so the Discord bot receives alerts during demos. Disable with DEMO_ALERTS=false.
+if (process.env.DEMO_ALERTS !== 'false') {
+  setInterval(() => {
+    const allDevices = simulator.getAllDevices();
+    const rooms = Object.keys(allDevices).filter((r) =>
+      allDevices[r].some((d) => d.status)
+    );
+    if (rooms.length === 0) return;
+
+    const room = rooms[Math.floor(Math.random() * rooms.length)];
+    const onDevices = allDevices[room].filter((d) => d.status);
+    const roomName = room
+      .split('-')
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+
+    const message = `${roomName}: ${onDevices.length} device(s) ON (${onDevices.map((d) => d.name).join(', ')})`;
+
+    alertEngine._addAlert({
+      type: 'demo',
+      severity: 'info',
+      room,
+      message,
+      devices: onDevices.map((d) => ({ id: d.id, name: d.name })),
+    });
+  }, 30000);
+}
+
 app.use(cors());
 app.use(express.json());
 app.use(requestLogger);

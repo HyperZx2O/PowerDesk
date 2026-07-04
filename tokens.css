@@ -1,0 +1,62 @@
+:root {
+  /* OKLCH Design Tokens — Midnight theme, Geist Sans + JetBrains Mono */
+
+  /* Palette — dark paper, cool-indigo accent */
+  --color-bg: oklch(8.5% 0.005 270);
+  --color-surface: oklch(13% 0.01 270);
+  --color-border: oklch(22% 0.015 270);
+  --color-primary: oklch(52% 0.22 285);
+  --color-primary-hover: oklch(56% 0.24 285);
+  --color-fan-on: oklch(72% 0.15 235);
+  --color-fan-off: oklch(48% 0.02 235);
+  --color-light-on: oklch(78% 0.17 85);
+  --color-light-off: oklch(38% 0.02 85);
+  --color-alert: oklch(70% 0.18 70);
+  --color-critical: oklch(55% 0.22 30);
+  --color-text-primary: oklch(93% 0.01 270);
+  --color-text-muted: oklch(52% 0.03 270);
+  --color-success: oklch(68% 0.2 145);
+
+  /* Fonts */
+  --font-sans: 'Geist Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+
+  /* Easing — Hallmark discipline: animate transform/opacity only */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  /* Font size scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-5xl: 3rem;
+  --text-8xl: 4.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+/* Hallmark · v1 · Dark energy monitor · Midnight/Indigo */
+
+:root {
+    --ease-out: ease;
+    --ease-in-out: ease;
+  }
+}

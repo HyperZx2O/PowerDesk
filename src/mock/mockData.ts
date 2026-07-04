@@ -4,8 +4,9 @@ import type { PowerSummary } from '../types/power';
 import { useDeviceStore } from '../store/deviceStore';
 import { useAlertStore } from '../store/alertStore';
 import { usePowerStore } from '../store/powerStore';
+import { ROOM_ORDER } from '../constants/rooms';
 
-const ROOMS = ['drawing-room', 'work-room-1', 'work-room-2'];
+const ROOMS = ROOM_ORDER;
 
 function createMockDevices(): Device[] {
   const devices: Device[] = [];
@@ -78,24 +79,19 @@ function generatePowerSummary(devices: Device[]): PowerSummary {
 
 const alertMessages: Record<string, Record<string, string>> = {
   'after-hours': {
-    'drawing-room': 'Device still running after hours in Drawing Room',
-    'work-room-1': 'Device still running after hours in Work Room 1',
-    'work-room-2': 'Device still running after hours in Work Room 2',
+    'drawing-room': 'Drawing Room has devices ON after office hours',
+    'work-room-1': 'Work Room 1 has devices ON after office hours',
+    'work-room-2': 'Work Room 2 has devices ON after office hours',
   },
-  'extended-on': {
-    'drawing-room': 'Device running for extended period in Drawing Room',
-    'work-room-1': 'Device running for extended period in Work Room 1',
-    'work-room-2': 'Device running for extended period in Work Room 2',
-  },
-  'high-power': {
-    'drawing-room': 'High power consumption detected in Drawing Room',
-    'work-room-1': 'High power consumption detected in Work Room 1',
-    'work-room-2': 'High power consumption detected in Work Room 2',
+  'continuous-runtime': {
+    'drawing-room': 'All devices in Drawing Room have been running for over 2 hours',
+    'work-room-1': 'All devices in Work Room 1 have been running for over 2 hours',
+    'work-room-2': 'All devices in Work Room 2 have been running for over 2 hours',
   },
 };
 
 function generateRandomAlert(): Alert {
-  const types = ['after-hours', 'extended-on', 'high-power'] as const;
+  const types = ['after-hours', 'continuous-runtime'] as const;
   const type = types[Math.floor(Math.random() * types.length)];
   const room = ROOMS[Math.floor(Math.random() * ROOMS.length)];
 

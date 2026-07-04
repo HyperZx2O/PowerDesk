@@ -7,19 +7,49 @@ interface AlertPanelProps {
   alerts: Alert[];
   onDismiss: (id: string) => void;
   alertCount: number;
+  isLoading?: boolean;
 }
 
-export function AlertPanel({ alerts, onDismiss, alertCount }: AlertPanelProps) {
+function AlertSkeleton() {
   return (
-    <div className="bg-surface rounded-xl border border-border">
+    <div className="flex items-center gap-3 p-3 border-b border-border last:border-0">
+      <div className="w-4 h-4 bg-border rounded animate-pulse shrink-0" />
+      <div className="flex-1 space-y-1.5">
+        <div className="h-3 w-3/4 bg-border rounded animate-pulse" />
+        <div className="h-2.5 w-1/2 bg-border rounded animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+export function AlertPanel({ alerts, onDismiss, alertCount, isLoading }: AlertPanelProps) {
+  if (isLoading) {
+    return (
+      <div className="bg-surface rounded-lg border border-border">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+          <div className="flex items-center gap-2">
+            <div className="w-3.5 h-3.5 bg-border rounded animate-pulse" />
+            <div className="h-3 w-16 bg-border rounded animate-pulse" />
+          </div>
+        </div>
+        <div className="max-h-64 overflow-y-auto scrollbar-thin">
+          <AlertSkeleton />
+          <AlertSkeleton />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-surface rounded-lg border border-border">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <div className="flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4 text-alert" />
-          <h2 className="text-sm font-medium text-text-primary">
-            Active Alerts
+          <AlertTriangle className="w-3.5 h-3.5 text-alert" />
+          <h2 className="text-xs font-medium text-text-primary uppercase tracking-wide">
+            Alerts
           </h2>
           {alertCount > 0 && (
-            <span className="px-2 py-0.5 text-xs font-medium bg-alert/20 text-alert rounded-full">
+            <span className="px-1.5 py-[1px] text-[10px] font-mono font-medium bg-alert/15 text-alert rounded-sm leading-none">
               {alertCount}
             </span>
           )}
@@ -29,13 +59,13 @@ export function AlertPanel({ alerts, onDismiss, alertCount }: AlertPanelProps) {
       <div className="max-h-64 overflow-y-auto scrollbar-thin">
         {alerts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 px-4">
-            <CheckCircle className="w-8 h-8 text-success mb-2" />
-            <p className="text-sm text-text-muted text-center">
-              No active alerts — All clear!
+            <CheckCircle className="w-6 h-6 text-success mb-2" />
+            <p className="text-xs text-text-muted text-center">
+              All clear
             </p>
           </div>
         ) : (
-          <div className="p-2 space-y-2">
+          <div className="p-1.5 space-y-1">
             <AnimatePresence mode="popLayout">
               {alerts.map((alert) => (
                 <AlertItem

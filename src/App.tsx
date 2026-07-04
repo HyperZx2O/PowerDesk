@@ -15,8 +15,7 @@ import { useOfficeSocket } from './ws/useOfficeSocket';
 import { startMockSimulation } from './mock/mockData';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-const ROOM_ORDER = ['drawing-room', 'work-room-1', 'work-room-2'];
+import { ROOM_ORDER } from './constants/rooms';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,19 +33,22 @@ function Dashboard() {
   const powerHistory = usePowerStore((state) => state.powerHistory);
   const { status: connectionStatus } = useOfficeSocket();
 
-  // Start mock simulation to provide data when backend is not available
+  // Mock simulation fallback when backend is unavailable
+  // Set VITE_USE_MOCK=true in .env to force mock mode
   useEffect(() => {
-    const cleanup = startMockSimulation();
-    return cleanup;
+    if (import.meta.env.VITE_USE_MOCK === 'true') {
+      const cleanup = startMockSimulation();
+      return cleanup;
+    }
   }, []);
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <div className="min-h-screen bg-bg flex items-center justify-center p-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-surface p-8 rounded-xl border border-border max-w-md text-center"
+          className="bg-surface p-8 rounded-lg border border-border max-w-md text-center"
         >
           <AlertCircle className="w-12 h-12 text-critical mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-text-primary mb-2">
@@ -76,7 +78,7 @@ function Dashboard() {
       topBar={<TopBar connectionStatus={connectionStatus} />}
       roomGrid={<RoomGrid devices={devices} isLoading={isLoading} />}
       powerMeter={
-        <PowerMeter totalWatts={totalWatts} estimatedKwh={estimatedKwh} />
+        <PowerMeter totalWatts={totalWatts} estimatedKwh={estimatedKwh} isLoading={isLoading} />
       }
       roomPowerBars={
         <>
@@ -90,12 +92,13 @@ function Dashboard() {
           ))}
         </>
       }
-      powerChart={<PowerChart data={powerHistory} />}
+      powerChart={<PowerChart data={powerHistory} isLoading={isLoading} />}
       alertPanel={
         <AlertPanel
           alerts={alerts}
           onDismiss={dismissAlert}
           alertCount={alertCount}
+          isLoading={isLoading}
         />
       }
       floorPlan={

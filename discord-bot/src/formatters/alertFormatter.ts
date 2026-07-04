@@ -2,22 +2,19 @@ import type { AlertPayload } from "../types.js";
 
 export function formatAlert(alert: AlertPayload): string {
   const time = formatAlertTime(alert.triggeredAt);
-  return [
-    `⚠️ Alert — ${time}`,
-    alert.message,
-    "",
-    `Room: ${formatRoomName(alert.room)}`,
-  ].join("\n");
+  const lines = [
+    `> ⚠️ **Alert** — ${time}`,
+    `> ${alert.message}`,
+    `> 📍 ${formatRoomName(alert.room)}`,
+  ];
+  return lines.join("\n");
 }
 
 function formatAlertTime(isoString: string): string {
   try {
     const date = new Date(isoString);
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
+    const ts = Math.floor(date.getTime() / 1000);
+    return `<t:${ts}:R>`;
   } catch {
     return isoString;
   }

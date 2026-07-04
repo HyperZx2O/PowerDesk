@@ -101,11 +101,11 @@ describe('AlertEngine', () => {
       assert.strictEqual(runtimeAlerts.length, 1);
       assert.strictEqual(runtimeAlerts[0].severity, 'info');
       assert.strictEqual(runtimeAlerts[0].room, 'drawing-room');
-      assert.ok(runtimeAlerts[0].message.includes('has been ON for'));
+      assert.ok(runtimeAlerts[0].message.includes('running for over'));
       assert.strictEqual(runtimeAlerts[0].devices.length, 1);
     });
 
-    it('creates per-device alerts for multiple devices in the same room', () => {
+    it('creates one per-room alert for multiple long-running devices', () => {
       const devices = sim.getAllDevices();
       for (const room of Object.values(devices)) {
         for (const d of room) {
@@ -120,7 +120,8 @@ describe('AlertEngine', () => {
       ae.check();
 
       const runtimeAlerts = ae.getAlerts().filter((a) => a.type === 'continuous-runtime');
-      assert.strictEqual(runtimeAlerts.length, 2);
+      assert.strictEqual(runtimeAlerts.length, 1);
+      assert.strictEqual(runtimeAlerts[0].devices.length, 2);
     });
 
     it('does NOT create alert if device is not old enough', () => {

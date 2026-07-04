@@ -3,7 +3,6 @@ import type { Device } from '../../types/device';
 import { DeviceCard } from '../device/DeviceCard';
 import { totalWatts, countOn } from '../../utils/deviceHelpers';
 import { formatRoomName, formatWatts } from '../../utils/formatters';
-import { AlertTriangle, Power } from 'lucide-react';
 
 interface RoomCardProps {
   room: string;
@@ -20,32 +19,26 @@ export function RoomCard({ room, devices, hasAlert = false }: RoomCardProps) {
     <div
       id={`room-${room}`}
       className={clsx(
-        'p-4 bg-surface rounded-xl border border-border transition-all duration-300',
-        hasAlert && 'border-alert/50 bg-alert/5'
+        'p-4 bg-surface rounded-lg border transition-colors duration-300',
+        hasAlert ? 'border-alert/50 bg-alert/[0.03]' : 'border-border'
       )}
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-text-primary">
+          {formatRoomName(room)}
+        </h3>
         <div className="flex items-center gap-2">
-          <h3 className="text-lg font-semibold text-text-primary">
-            {formatRoomName(room)}
-          </h3>
-          {hasAlert && (
-            <AlertTriangle className="w-4 h-4 text-alert animate-pulse" />
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <Power className="w-4 h-4 text-text-muted" />
-          <span className="font-mono text-sm text-text-muted">
+          <span className="font-mono text-xs text-text-muted tabular-nums">
             {formatWatts(roomWatts)}
           </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-sm text-text-muted">
-          {devicesOn}/{totalDevices} devices on
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-xs text-text-muted">
+          {devicesOn}/{totalDevices}
         </span>
-        <div className="flex-1 h-1.5 bg-border rounded-full overflow-hidden">
+        <div className="flex-1 h-0.5 bg-border overflow-hidden rounded-full">
           <div
             className="h-full bg-primary transition-all duration-500"
             style={{
@@ -55,7 +48,7 @@ export function RoomCard({ room, devices, hasAlert = false }: RoomCardProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
         {devices.map((device) => (
           <DeviceCard key={device.id} device={device} />
         ))}

@@ -57,29 +57,31 @@ class AlertEngine extends EventEmitter {
     if (!config.enableRuntimeAlerts) return;
 
     for (const room of ROOMS) {
-      for (const device of allDevices[room]) {
-        if (!device.status) continue;
-
+      const devices = allDevices[room];
+      const longRunning = devices.filter((d) => {
+        if (!d.status) return false;
         const hours = now
-          ? (now.getTime() - new Date(device.lastChanged).getTime()) / (1000 * 60 * 60)
-          : hoursSince(device.lastChanged);
-        if (hours < config.continuousRuntimeThreshold) continue;
+          ? (now.getTime() - new Date(d.lastChanged).getTime()) / (1000 * 60 * 60)
+          : hoursSince(d.lastChanged);
+        return hours >= config.continuousRuntimeThreshold;
+      });
 
-        const key = `continuous-runtime:${device.id}`;
-        if (this._map.has(key)) continue;
+      if (longRunning.length === 0) continue;
 
-        const roomName = this._formatRoomName(room);
-        const message = `${roomName}: ${device.name} has been ON for ${config.continuousRuntimeThreshold}+ hours continuously`;
+      const key = `continuous-runtime:${room}`;
+      if (this._map.has(key)) continue;
 
-        this._addAlert({
-          type: 'continuous-runtime',
-          severity: 'info',
-          room,
-          message,
-          devices: [{ id: device.id, name: device.name }],
-          _key: key,
-        });
-      }
+      const roomName = this._formatRoomName(room);
+      const message = `${roomName}: All devices have been running for over ${config.continuousRuntimeThreshold} hours continuously`;
+
+      this._addAlert({
+        type: 'continuous-runtime',
+        severity: 'info',
+        room,
+        message,
+        devices: longRunning.map((d) => ({ id: d.id, name: d.name })),
+        _key: key,
+      });
     }
   }
 

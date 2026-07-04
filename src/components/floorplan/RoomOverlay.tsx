@@ -12,20 +12,35 @@ interface RoomOverlayProps {
 
 export function RoomOverlay({ x, y, width, height, room, hasAlert, onClick }: RoomOverlayProps) {
   return (
-    <motion.rect
-      x={x}
-      y={y}
-      width={width}
-      height={height}
-      fill={hasAlert ? '#f59e0b' : '#6366f1'}
-      fillOpacity={hasAlert ? 0.15 : 0}
-      initial={{ fillOpacity: 0 }}
-      animate={hasAlert ? { fillOpacity: [0.1, 0.2, 0.1] } : { fillOpacity: 0 }}
-      transition={{ duration: 2, repeat: hasAlert ? Infinity : 0 }}
-      whileHover={{ fillOpacity: 0.1 }}
-      onClick={onClick}
-      style={{ cursor: 'pointer' }}
-      data-room={room}
-    />
+    <g>
+      {hasAlert && (
+        <rect
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          fill="none"
+          stroke="var(--color-alert)"
+          strokeWidth={2}
+          strokeDasharray="4 4"
+          rx={4}
+        />
+      )}
+      <motion.rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={hasAlert ? 'var(--color-alert)' : 'transparent'}
+        fillOpacity={hasAlert ? 0.1 : 0}
+        initial={{ fillOpacity: 0 }}
+        animate={hasAlert ? { fillOpacity: [0.1, 0.3, 0.1] } : { fillOpacity: 0 }}
+        transition={{ duration: 1.5, repeat: hasAlert ? Infinity : 0, ease: 'easeInOut' }}
+        whileHover={{ fillOpacity: hasAlert ? 0.2 : 0.08 }}
+        onClick={onClick}
+        style={{ cursor: 'pointer' }}
+        data-room={room}
+      />
+    </g>
   );
 }

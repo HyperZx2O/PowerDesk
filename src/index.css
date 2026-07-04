@@ -1,57 +1,61 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "../tokens.css";
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --color-background: #0f1117;
-  --color-surface: #1a1d27;
-  --color-border: #2d3147;
-  --color-primary: #6366f1;
-  --color-fan-on: #38bdf8;
-  --color-light-on: #fbbf24;
-  --color-alert: #f59e0b;
-  --color-critical: #ef4444;
-  --color-text-primary: #f1f5f9;
-  --color-text-muted: #64748b;
-  --color-success: #22c55e;
+@theme {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-border: var(--color-border);
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-fan-on: var(--color-fan-on);
+  --color-fan-off: var(--color-fan-off);
+  --color-light-on: var(--color-light-on);
+  --color-light-off: var(--color-light-off);
+  --color-alert: var(--color-alert);
+  --color-critical: var(--color-critical);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-muted: var(--color-text-muted);
+  --color-success: var(--color-success);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
-body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background-color: var(--color-background);
-  color: var(--color-text-primary);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  * {
+    border-color: var(--color-border);
+  }
 }
 
-.font-mono {
-  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) var(--color-surface);
 }
 
-@layer utilities {
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-border) var(--color-surface);
-  }
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
 
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: var(--color-surface);
+  border-radius: 3px;
+}
 
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: var(--color-surface);
-    border-radius: 3px;
-  }
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
 
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border-radius: 3px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: var(--color-primary);
-  }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
 }

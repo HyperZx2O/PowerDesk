@@ -27,10 +27,11 @@ export function startAlertListener(discordClient: Client): void {
 
     ws.on("message", (raw) => {
       try {
-        const payload = JSON.parse(String(raw));
-        if (payload.type !== "alert-triggered") return;
+        const msg = JSON.parse(String(raw));
+        if (msg.type !== "alert-triggered") return;
 
-        const result = alertPayloadSchema.safeParse(payload);
+        const alertData = msg.alert ?? msg;
+        const result = alertPayloadSchema.safeParse(alertData);
         if (!result.success) {
           logger.warn("Invalid alert payload received");
           return;
