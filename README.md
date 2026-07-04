@@ -1,31 +1,96 @@
-# PowerDesk Backend
+# PowerDesk
 
-Real-time office device simulator backend with REST API + WebSocket broadcasting.
+Real-time office device monitoring dashboard with a Discord bot for instant queries. Simulates 15 devices (fans and lights) across 3 rooms, broadcasting live state changes, power consumption, and alerts through a REST API, WebSocket, and Discord integration.
 
-- 📖 [Integration Contract](INTEGRATION.md) — full API docs for consumers (Dashboard, Discord Bot)
-- 📊 [System Architecture](docs/system-diagram.svg) — component diagram
+**Built for the 26 Techathon Nationals at IUT Robotics Society.**
 
 ---
 
-## Prerequisites
+## Live Deployment
 
-- Node.js 18+ (uses `node --test` runner, `fetch` global)
-- npm
+| Component | URL |
+|-----------|-----|
+| Dashboard | [power-desk.vercel.app](https://power-desk.vercel.app/) |
+| Backend API | [powerdesk-api.onrender.com](https://powerdesk-api.onrender.com/) |
+| Discord Bot | [powerdesk-bot.onrender.com](https://powerdesk-bot.onrender.com/) |
 
-## Quick Start
+---
 
-```bash
-# 1. Install dependencies
-npm install
+## Architecture
 
-# 2. Copy environment config and adjust if needed
-cp .env.example .env
+![System Architecture](docs/system-diagram.svg)
 
-# 3. Start the server
-npm start
+![Office Floor Plan](docs/office-floorplan.svg)
+
+![Detailed Architecture](docs/architecture-diagram.svg)
+
+---
+
+## Tech Stack
+
+| Component | Technologies |
+|-----------|-------------|
+| **Backend** | Node.js, Express 5, WebSocket (`ws`), Zod validation |
+| **Dashboard** | React 19, Vite, TypeScript, Tailwind CSS v4, Zustand, Recharts, Framer Motion |
+| **Discord Bot** | discord.js v14, TypeScript, Axios, Zod, Pino logging |
+| **Infrastructure** | Vercel (dashboard), Render (backend + bot), UptimeRobot (keep-alive) |
+
+---
+
+## Project Structure
+
+```
+powerdesk/
+├── src/                        # Backend (CommonJS) + Dashboard (TypeScript/ESM)
+│   ├── index.js                # Express + WebSocket entry point
+│   ├── simulator.js            # Device state simulation engine
+│   ├── powerCalculator.js      # Power consumption calculations
+│   ├── alertEngine.js          # Alert detection (after-hours, continuous runtime)
+│   ├── websocket.js            # WebSocket broadcasting
+│   ├── config.js               # Environment configuration
+│   ├── routes/                 # REST API routes
+│   ├── middleware/              # Express middleware
+│   ├── components/             # React UI components
+│   ├── store/                  # Zustand state management
+│   ├── types/                  # TypeScript types + Zod schemas
+│   └── utils/                  # Shared utilities
+├── discord-bot/                # Discord bot (TypeScript, ESM)
+│   └── src/
+│       ├── index.ts            # Bot entry point
+│       ├── commands/           # Slash + prefix command handlers
+│       ├── formatters/         # Response formatting
+│       ├── api/                # Backend API client
+│       ├── ws/                 # WebSocket alert listener
+│       └── llm/                # Groq LLM humanization
+├── test/                       # Backend tests (57 tests)
+├── docs/                       # Diagrams and specs
+└── context/                    # Design specifications
 ```
 
-The server starts on **http://localhost:5000** and WebSocket on **ws://localhost:8080**.
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ (uses `node --test` runner and global `fetch`)
+- npm
+
+### Backend
+
+```bash
+# Install dependencies
+npm install
+
+# Configure environment
+cp .env.example .env
+
+# Start the server (REST on :5000, WebSocket on :5000)
+npm start
+
+# Development with auto-restart
+npm run dev
+```
 
 Verify it's running:
 
@@ -33,121 +98,104 @@ Verify it's running:
 curl http://localhost:5000/api/status
 ```
 
-Expected response:
+### Dashboard
+
+```bash
+# The dashboard shares the root package.json
+# Set the backend URL for local development
+echo "VITE_BACKEND_URL=http://localhost:5000" > .env
+echo "VITE_WS_URL=ws://localhost:5000" >> .env
+
+# Start the dev server
+npx vite
+
+# Production build
+npm run build
+```
+
+### Discord Bot
+
+```bash
+cd discord-bot
+
+# Install dependencies
+npm install
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your Discord token, backend URL, etc.
+
+# Register slash commands (one-time)
+npm run register
+
+# Start the bot
+npm start
+
+# Development with auto-restart
+npm run dev
+```
+
+---
+
+## API Reference
+
+All responses use a standard envelope:
 
 ```json
 {
   "success": true,
-  "data": {
-    "status": "healthy",
-    "backend": { "uptime": 5, "version": "1.0.0" },
-    "simulator": { "running": true, "devicesTracked": 15, "lastUpdate": "..." }
-  },
-  "timestamp": "...",
+  "data": { "..." },
+  "timestamp": "2026-07-04T10:00:00.000Z",
   "error": null
 }
 ```
 
-## Development
+### Endpoints
 
-```bash
-npm run dev      # starts with nodemon (auto-restart on changes)
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/status` | Health check with simulator metadata |
+| `GET` | `/api/devices` | All 15 devices nested by room |
+| `GET` | `/api/devices/:room` | Devices in a specific room |
+| `GET` | `/api/power` | Full power consumption payload |
+| `GET` | `/api/power/summary` | Bot-friendly power summary |
+| `GET` | `/api/alerts` | Queryable alert feed |
 
-## Testing
+### WebSocket Events
 
-```bash
-npm test         # runs all 50+ tests with Node built-in runner
-```
+Connect to the same port as the REST API. No auth required.
 
-Tests include unit tests (simulator, power calculator, alert engine) and integration tests (all REST endpoints, WebSocket).
+| Event | Trigger | Payload |
+|-------|---------|---------|
+| `device-update` | Simulator flips a device (every 30-60s) | Device object with new status |
+| `alert-triggered` | Alert condition met | Alert object with severity and message |
+| `power-update` | Fixed 5-second interval | Total power + per-room breakdown |
 
----
-
-## API Endpoints
-
-All responses use the standard envelope (see [INTEGRATION.md](INTEGRATION.md) for full schemas).
-
-### GET /api/status
-
-Health check with live simulator metadata.
-
-```bash
-curl http://localhost:5000/api/status
-```
-
-### GET /api/devices
-
-All 15 devices nested by room (drawing-room, work-room-1, work-room-2).
-
-```bash
-curl http://localhost:5000/api/devices
-```
-
-### GET /api/devices/:room
-
-Devices in a specific room.
-
-```bash
-curl http://localhost:5000/api/devices/drawing-room
-curl http://localhost:5000/api/devices/work-room-1
-curl http://localhost:5000/api/devices/not-a-room     # returns 404 ROOM_NOT_FOUND
-```
-
-### GET /api/power
-
-Full power consumption payload (total, by-room breakdown, fan/light breakdown, daily kWh estimate).
-
-```bash
-curl http://localhost:5000/api/power
-```
-
-### GET /api/power/summary
-
-Lean power summary for the Discord bot.
-
-```bash
-curl http://localhost:5000/api/power/summary
-```
-
-### GET /api/alerts
-
-Queryable alert feed.
-
-```bash
-curl http://localhost:5000/api/alerts
-curl "http://localhost:5000/api/alerts?since=2026-07-03T20:00:00.000Z"   # since timestamp
-curl "http://localhost:5000/api/alerts?limit=5"                           # last 5 alerts
-curl "http://localhost:5000/api/alerts?since=invalid"                     # returns 400
-```
+Full API documentation: [INTEGRATION.md](INTEGRATION.md)
 
 ---
 
-## WebSocket Testing
+## Discord Bot Commands
 
-Connect to `ws://localhost:8080` to receive live events.
+| Command | Description |
+|---------|-------------|
+| `/status` or `!status` | Show on/off state of all office devices |
+| `/room name:<room>` or `!room <room>` | Show devices for a specific room |
+| `/usage` or `!usage` | Show current power usage and daily estimate |
 
-```bash
-node -e "
-const WebSocket = require('ws');
-const ws = new WebSocket('ws://localhost:8080');
-ws.on('message', (data) => console.log(JSON.parse(data.toString())));
-ws.on('open', () => console.log('Connected'));
-"
-```
+**Valid room names:** `drawing`, `work1`, `work2`
 
-This logs every `device-update`, `alert-triggered`, and `power-update` event as they happen.
+**LLM Humanization:** When `GROQ_API_KEY` is set, responses are rephrased by an LLM for a conversational tone. Falls back to template formatters on failure.
 
 ---
 
 ## Configuration
 
-Copy `.env.example` to `.env` and edit to override defaults:
+### Backend Environment Variables
 
 | Variable | Default | Description |
-|---|---|---|
+|----------|---------|-------------|
 | `PORT` | `5000` | HTTP server port |
-| `WS_PORT` | `8080` | WebSocket server port |
 | `HOST` | `localhost` | Bind address |
 | `OFFICE_START_HOUR` | `9` | Office hours start (24h) |
 | `OFFICE_END_HOUR` | `17` | Office hours end (24h) |
@@ -157,123 +205,84 @@ Copy `.env.example` to `.env` and edit to override defaults:
 | `ENABLE_RUNTIME_ALERTS` | `true` | Toggle continuous-runtime alert detection |
 | `CONTINUOUS_RUNTIME_THRESHOLD_HOURS` | `2` | Hours before runtime alert triggers |
 
+### Discord Bot Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DISCORD_TOKEN` | Yes | Bot token from Discord Developer Portal |
+| `CLIENT_ID` | Yes | Bot application client ID |
+| `GUILD_ID` | Yes | Discord server ID |
+| `ALERT_CHANNEL_ID` | Yes | Channel for proactive alerts |
+| `BACKEND_BASE_URL` | Yes | Backend REST URL |
+| `BACKEND_WS_URL` | Yes | Backend WebSocket URL |
+| `GROQ_API_KEY` | No | Groq API key for LLM humanization |
+| `GROQ_MODEL` | No | LLM model (default: `llama-3.3-70b-versatile`) |
+
 ---
 
-## System Diagram
+## Testing
 
-![System Architecture](docs/system-diagram.svg)
-
----
-
-## Verification Checklist
-
-Use these steps to confirm the backend is fully functional before wiring up the React Dashboard and Discord Bot.
-
-### 1. REST API Health
+### Backend
 
 ```bash
-curl http://localhost:5000/api/status | jq .data.status
-# → "healthy"
+npm test    # 57 tests across 10 files
 ```
 
-### 2. Device Count
+Covers: simulator, power calculator, alert engine, all REST endpoints, WebSocket server, validation, request logging.
+
+### Discord Bot
 
 ```bash
-curl http://localhost:5000/api/devices | jq '.data | length'
-# → 3  (drawing-room, work-room-1, work-room-2)
-
-curl http://localhost:5000/api/devices | jq '[.data[] | length] | add'
-# → 15 (total devices across all rooms)
+cd discord-bot && npm test    # 55 tests across 6 files
 ```
 
-### 3. Power Consistency
-
-```bash
-# totalPower should equal sum of byRoom power values
-curl http://localhost:5000/api/power | jq '.data.totalPower'
-curl http://localhost:5000/api/power | jq '[.data.byRoom[] | .power] | add'
-# → both return the same number
-```
-
-### 4. Alerts Feed
-
-```bash
-curl http://localhost:5000/api/alerts | jq '.data.alerts | length'
-# → 0 or more (depending on simulation state)
-```
-
-### 5. WebSocket Events
-
-Run the WebSocket test snippet above. After connecting, you should see:
-- `power-update` messages every ~5 seconds
-- `device-update` messages when the simulator ticks (every 30–60s)
-- `alert-triggered` messages if alert conditions are met
-
-### 6. End-to-End Flow (Dashboard + Bot)
-
-Once the React Dashboard and Discord Bot are running:
-
-1. **Dashboard** opens and renders 15 devices across 3 rooms
-2. Device statuses change every 30–60 seconds without page refresh
-3. Power meter shows live `totalPower` updating every 5 seconds
-4. Discord bot responds to `!status` with device summary
-5. Discord bot responds to `!usage` with power data
-6. Discord bot responds to `!room <room>` with per-room device states
-7. If an alert triggers, the Discord bot receives and posts it within 5 seconds
+Covers: config validation, command routing, formatters, error handling, LLM humanization, logging.
 
 ---
 
 ## Deployment
 
-### Railway
+The project is deployed on three platforms:
 
-```bash
-# Install Railway CLI or use GitHub integration
-railway login
-railway init
-railway up
+| Platform | Service | Purpose |
+|----------|---------|---------|
+| **Vercel** | Dashboard | Static SPA hosting with automatic deployments |
+| **Render** | Backend API | Node.js server for REST + WebSocket |
+| **Render** | Discord Bot | Long-running bot process with health check |
+| **UptimeRobot** | Keep-alive | Pings both Render services every 5 minutes |
 
-# Set environment variables in Railway dashboard:
-# PORT, WS_PORT, HOST, OFFICE_START_HOUR, OFFICE_END_HOUR, etc.
-```
+### Deploy Your Own
 
-### Render
-
-1. Push repo to GitHub
-2. In Render Dashboard → New Web Service → connect repo
-3. Build command: `npm install`
-4. Start command: `npm start`
-5. Add environment variables in Render dashboard
-
-Both platforms will provide a public URL. Set `CORS_ORIGIN` if needed, or leave CORS open for development.
+1. **Fork the repository** on GitHub
+2. **Backend:** Create a Render Web Service from the repo
+   - Build: `npm install`
+   - Start: `node src/index.js`
+   - Set environment variables in Render dashboard
+3. **Bot:** Create a second Render Web Service
+   - Root Directory: `discord-bot`
+   - Build: `npm install`
+   - Start: `npm start`
+   - Set environment variables
+4. **Dashboard:** Import into Vercel
+   - Set `VITE_BACKEND_URL` and `VITE_WS_URL` as build-time env vars
+5. **UptimeRobot:** Add HTTP monitors for both Render service URLs
 
 ---
 
-## Project Structure
+## Data Model
 
-```
-src/
-├── index.js              # Entry point, Express + WebSocket setup
-├── simulator.js          # Device state & simulation engine
-├── powerCalculator.js    # Power consumption logic
-├── alertEngine.js        # Alert detection & publishing
-├── websocket.js          # WebSocket broadcasting
-├── config.js             # Environment configuration
-├── routes/
-│   ├── status.js         # GET /api/status
-│   ├── devices.js        # GET /api/devices, /api/devices/:room
-│   ├── power.js          # GET /api/power, /api/power/summary
-│   └── alerts.js         # GET /api/alerts
-├── middleware/
-│   ├── errorHandler.js   # Global error handler
-│   ├── validation.js     # Request validation helpers
-│   └── requestLogger.js  # 4xx/5xx logging
-└── utils/
-    ├── logger.js         # Console logging wrapper
-    ├── response.js       # Standard envelope helpers
-    ├── constants.js      # Rooms, power wattages
-    └── timings.js        # After-hours & runtime helpers
-test/                     # 10 test files, 50+ tests
-docs/
-└── system-diagram.svg    # Architecture diagram
-```
+15 simulated devices across 3 rooms:
+
+| Room | Fans | Lights | Total |
+|------|------|--------|-------|
+| Drawing Room | 2 | 3 | 5 |
+| Work Room 1 | 2 | 3 | 5 |
+| Work Room 2 | 2 | 3 | 5 |
+
+Power consumption: **60W** per fan, **15W** per light. The simulator flips 1-2 devices every 30-60 seconds.
+
+---
+
+## License
+
+ISC
