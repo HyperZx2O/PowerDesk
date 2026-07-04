@@ -1,13 +1,11 @@
 # PowerDesk
 
-**Team CLI** — Techathon Nationals & Rover Summit Hackathon '26
-
 Real-time office device monitoring dashboard with a Discord bot for instant queries. Simulates 15 devices (fans and lights) across 3 rooms, broadcasting live state changes, power consumption, and alerts through a REST API, WebSocket, and Discord integration.
 
 ---
 
 ## Team
-
+**Team CLI** — Techathon Nationals & Rover Summit Hackathon '26
 | Name | GitHub | Email |
 |------|--------|-------|
 | MD. Sadman Saif | [@HyperZx2O](https://github.com/HyperZx2O) | sadman.zarifsaif@gmail.com |
